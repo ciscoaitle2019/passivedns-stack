@@ -1,0 +1,60 @@
+version: "3.7"
+
+services:
+  pdns:
+    image: kelvinyasu/ud-passivedns
+    network_mode: "host"
+    container_name: pdns
+    restart: unless-stopped
+    environment:
+      INTERFACE: "eno2"
+    volumes:
+      - type: bind
+        source: /var/log/passivedns
+        target: /var/log/passivedns
+  db:
+    image: mysql:5.7
+    ports: 
+      - 127.0.0.1:3306:3306
+    container_name: pdns-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: pdns
+      MYSQL_DATABASE: pdns
+    volumes:
+      - type: bind
+        source: ./DB
+        target: /var/lib/mysql
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+
+  pdns2db:
+    image: kelvinyasu/ud-pdns2db
+    network_mode: "host"
+    container_name: pdns2db
+    restart: unless-stopped
+    depends_on:
+      - db
+    volumes:
+      - type: bind
+        source: /var/log/passivedns
+        target: /var/log/passivedns
+        read_only: true
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+
+  pdnsweb:
+    image: kelvinyasu/ud-pdnsweb
+    network_mode: "host"
+    container_name: pdnsweb
+    restart: unless-stopped
+    depends_on:
+      - pdns2db
+    volumes:
+      - ${PWD}/conf/php.ini:/etc/php/5.6/apache2/php.ini
+      - ${PWD}/html:/var/www/html
+      - ${PWD}/conf/000-default.conf:/etc/apache2/sites-available/000-default.conf
+
