@@ -7,7 +7,7 @@ services:
     container_name: pdns
     restart: unless-stopped
     environment:
-      INTERFACE: "eno2"
+      INTERFACE: "eno2"    ### <--- Modify your monitoring interface here!
     volumes:
       - /var/log/passivedns:/var/log/passivedns
   db:
