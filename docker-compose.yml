@@ -2,16 +2,14 @@ version: "3.7"
 
 services:
   pdns:
-    image: kelvinyasu/ud-passivedns
+    image: ciscoaitle2019/passivedns
     network_mode: "host"
     container_name: pdns
     restart: unless-stopped
     environment:
       INTERFACE: "eno2"
     volumes:
-      - type: bind
-        source: /var/log/passivedns
-        target: /var/log/passivedns
+      - /var/log/passivedns:/var/log/passivedns
   db:
     image: mysql:5.7
     ports: 
@@ -30,7 +28,7 @@ services:
         target: /etc/localtime
 
   pdns2db:
-    image: kelvinyasu/ud-pdns2db
+    image: ciscoaitle2019/pdns2db
     network_mode: "host"
     container_name: pdns2db
     restart: unless-stopped
@@ -47,7 +45,7 @@ services:
         read_only: true
 
   pdnsweb:
-    image: kelvinyasu/ud-pdnsweb
+    image: ciscoaitle2019/pdnsweb
     network_mode: "host"
     container_name: pdnsweb
     restart: unless-stopped
